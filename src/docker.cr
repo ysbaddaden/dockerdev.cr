@@ -26,11 +26,43 @@ module Docker
     end
   end
 
-  def self.network_connect(id : String, *, container : ::Docker::NetworkConnectRequest) : Nil
+  def self.network_inspect?(id : String, *, verbose : Bool? = nil, scope : String? = nil) : Network?
+    query = Params.build do |qs|
+      qs.add("verbose", verbose) unless verbose.nil?
+      qs.add("scope", scope) unless scope.nil?
+    end
+    response = client.get("/v1.41/networks/#{URI.encode_path_segment(id)}?#{query}")
+    case response.status_code
+    when 200
+      Network.from_json(response.body)
+    when 404
+      # not found
+    when 500
+      raise ErrorResponse.from_json(response.body)
+    else
+      unexpected_response(response)
+    end
+  end
+
+  def self.network_create(*, network_config : NetworkCreateRequest) : NetworkCreateResponse
+    headers = HTTP::Headers{"Content-Type" => "application/json"}
+    response = client.post("/v1.41/networks/create", headers: headers, body: network_config.to_json)
+    case response.status_code
+    when 201
+      NetworkCreateResponse.from_json(response.body)
+    when 403, 404, 500
+      raise ErrorResponse.from_json(response.body)
+    else
+      unexpected_response(response)
+    end
+  end
+
+  def self.network_connect(id : String, *, container : NetworkConnectRequest) : Nil
     headers = HTTP::Headers{"Content-Type" => "application/json"}
     response = client.post("/v1.41/networks/#{URI.encode_path_segment(id)}/connect", headers: headers, body: container.to_json)
     case response.status_code
     when 200
+      # ok
     when 403, 404, 500
       raise ErrorResponse.from_json(response.body)
     else

@@ -5,9 +5,15 @@ DOMAIN = ENV.fetch("DOMAIN_TLD", "lvh.me")
 NETWORK_NAME = ENV.fetch("NETWORK_NAME", "shared")
 
 Log.setup_from_env
-Log.info { "waiting for container:create events" }
 
-# TODO: create shared network if it doesn't exist
+if network = Docker.network_inspect?(NETWORK_NAME)
+  Log.info { "Using existing network name=#{network.name} id=#{network.id[0, 12]}" }
+else
+  network = Docker.network_create(network_config: Docker::NetworkCreateRequest.new(name: NETWORK_NAME))
+  Log.info { "Created network name=#{NETWORK_NAME} id=#{network.id[0, 12]}" }
+end
+
+Log.info { "waiting for container:create events" }
 
 filters = {
   type: {"container"},
