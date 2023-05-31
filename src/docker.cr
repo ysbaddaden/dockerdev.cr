@@ -3,7 +3,7 @@ require "./docker/schemas"
 require "./docker/params"
 
 module Docker
-  def self.events(*, since : String? = nil, _until : String? = nil, filters : String? = nil, & : EventMessage ->)
+  def self.events(*, since : String? = nil, _until : String? = nil, filters : String? = nil, & : EventMessage ->) : Nil
     client = Client.new
 
     query = Params.build do |qs|
@@ -26,10 +26,9 @@ module Docker
     end
   end
 
-  def self.network_connect(id : String, *, container : ::Docker::NetworkConnectRequest)
-    body = { "container" => container }.to_json
+  def self.network_connect(id : String, *, container : ::Docker::NetworkConnectRequest) : Nil
     headers = HTTP::Headers{"Content-Type" => "application/json"}
-    response = client.post("/v1.41/networks/#{URI.encode_path_segment(id)}/connect", headers: headers, body: body)
+    response = client.post("/v1.41/networks/#{URI.encode_path_segment(id)}/connect", headers: headers, body: container.to_json)
     case response.status_code
     when 200
     when 403, 404, 500
