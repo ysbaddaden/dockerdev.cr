@@ -1,0 +1,10 @@
+version: 2.0
+shards:
+  docker:
+    git: https://github.com/jeromegn/docker.cr.git
+    version: 0.2.0
+
+  json_mapping:
+    git: https://github.com/crystal-lang/json_mapping.cr.git
+    version: 0.1.1
+

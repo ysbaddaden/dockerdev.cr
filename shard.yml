@@ -1,0 +1,18 @@
+name: dockerdev
+version: 0.1.0
+
+authors:
+  - Julien Portalier <jportalier@manas.tech>
+
+description: |
+  DockerDev HTTP Proxy
+
+dependencies:
+  docker:
+    github: jeromegn/docker.cr
+
+targets:
+  dockerdev:
+    main: src/dockerdev.cr
+
+license: MIT
