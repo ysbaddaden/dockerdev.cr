@@ -44,7 +44,7 @@ module Docker
     end
   end
 
-  def self.network_create(*, network_config : NetworkCreateRequest) : NetworkCreateResponse
+  def self.network_create(network_config : NetworkCreateRequest) : NetworkCreateResponse
     headers = HTTP::Headers{"Content-Type" => "application/json"}
     response = client.post("/v1.41/networks/create", headers: headers, body: network_config.to_json)
     case response.status_code
@@ -57,7 +57,7 @@ module Docker
     end
   end
 
-  def self.network_connect(id : String, *, container : NetworkConnectRequest) : Nil
+  def self.network_connect(id : String, container : NetworkConnectRequest) : Nil
     headers = HTTP::Headers{"Content-Type" => "application/json"}
     response = client.post("/v1.41/networks/#{URI.encode_path_segment(id)}/connect", headers: headers, body: container.to_json)
     case response.status_code
